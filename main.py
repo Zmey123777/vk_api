@@ -1,6 +1,7 @@
 import requests as req
 from config import ACCESSTOKEN, YANDEXTOKEN
 
+
 class VK:
     def __init__(self, token, owner_id, version='5.131') -> None:
         self.owner_id = owner_id
@@ -76,8 +77,3 @@ data = vk.get_photos()
 
 vk.save_photos(data)
 
-# url = 'https://sun9-12.userapi.com/impg/c855120/v855120592/241212/IKJ6A9pcDes.jpg?size=75x56&quality=96&sign=ccb8dfab8b6bedfd2cd678a3af5119f0&c_uniq_tag=9gXAZfmcLIo43cHKqQitlTdLkDj947uQR1p-plJ7FBY&type=album'
-
-# yandex = YandexRepository('/Netology')
-
-# yandex.yandex_save(url, YANDEXTOKEN)
