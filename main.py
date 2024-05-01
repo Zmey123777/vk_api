@@ -1,8 +1,10 @@
 import requests as req
 import json
-from config import ACCESSTOKEN, YANDEXTOKEN
+import logging
+from config import VKACCESSTOKEN, YANDEXTOKEN
 
 
+# Класс для получения и записи фотографий профия Вконтакте
 class VK:
     def __init__(self, token, owner_id, version='5.131') -> None:
         self.owner_id = owner_id
@@ -21,8 +23,8 @@ class VK:
 
         return response.json()
    
-    
-    def save_photos(self, data):
+    # Основной метод программы который записывает полученные фотографии
+    def save_photos(self, data) -> None:
          saved_photos_info = []
          if 'response' in data:
             photos = data['response']['items']
@@ -37,6 +39,7 @@ class VK:
                 photo_url = next((size['url'] for size in sizes if size['type'] in ['z']), None)
                 path = f'/Netology/{likes}'
                 yandex = YandexRepository(path)
+                logging.info('Отправка файла в Яндекс репозиторий')
                 yandex.yandex_save(photo_url, YANDEXTOKEN)                 
                 self.last_likes_count = likes
 
@@ -49,15 +52,16 @@ class VK:
 
          with open('json_data.json', 'w') as json_file:
                 json.dump(saved_photos_info, json_file, indent=4)
-                print(f"Файл записан: {json_file}.")
+                logging.debug(f" Отладочный файл записан: {json_file}.")
 
 
+# Класс для записи фотографий в Яндекс репозиторий
 class YandexRepository:
     def __init__(self, path) -> None:
         self.path = path
     
-
-    def yandex_save(self, url, auth):
+    # Метод использующий Яндекс REST API для записи фотографий на диск Папка /Netology
+    def yandex_save(self, url, auth) -> None:
         api_url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
 
         headers = {
@@ -78,18 +82,20 @@ class YandexRepository:
             if response.status_code == 202:
                 upload_href = response_data['href']
                 if upload_href:
-                    print(f"Файл загружен на диск: {upload_href}")
+                    logging.info(f"Файл загружен на Яндекс диск: {upload_href}")
                 else:
-                    print("Файл не найден")
+                    logging.info("Файл не найден")
             else:
-                print(f"Ошибка: {response_data.get('message')}")
+                logging.info(f"Ошибка: {response_data.get('message')}")
         except req.exceptions.RequestException as e:
-            print(f"Ошибка: {e}")
-            
+            logging.info(f"Ошибка: {e}")
 
-access_token = ACCESSTOKEN
-owner_id = 7770471
-vk = VK(access_token, owner_id)
-data = vk.get_photos()
-vk.save_photos(data)
 
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+
+    access_token = VKACCESSTOKEN
+    owner_id = 7770471
+    vk = VK(access_token, owner_id)
+    data = vk.get_photos()
+    vk.save_photos(data)
