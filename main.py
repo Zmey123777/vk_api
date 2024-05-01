@@ -33,7 +33,6 @@ class VK:
                 likes = photo['likes']['count']
                 if self.last_likes_count is not None and likes == self.last_likes_count:
                     likes = photo['likes']['count'] + photo['date']
-
                 sizes = photo['sizes']
                 photo_url = next((size['url'] for size in sizes if size['type'] in ['z']), None)
                 path = f'/Netology/{likes}'
